@@ -46,6 +46,8 @@ LABEL name="kill-the-newsletter" \
       org.opencontainers.image.description="Email-to-RSS bridge converting newsletters to Atom feeds" \
       org.opencontainers.image.licenses="AGPL-3.0-or-later"
 
+USER root
+
 WORKDIR /app
 
 # Copy the self-contained binary and source tree from download stage
