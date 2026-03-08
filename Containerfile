@@ -17,6 +17,8 @@
 # Stage 1: Download and prepare release artifacts
 FROM registry.access.redhat.com/ubi10/ubi AS download
 
+RUN dnf install -y openssl && dnf clean all
+
 WORKDIR /build
 
 # Download Kill the Newsletter v2.0.9 pre-built release (self-contained binary)
