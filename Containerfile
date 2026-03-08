@@ -17,7 +17,7 @@
 # Stage 1: Download and prepare release artifacts
 FROM registry.access.redhat.com/ubi10/ubi AS download
 
-RUN dnf install -y openssl && dnf clean all
+RUN dnf install -y openssl libatomic && dnf clean all
 
 WORKDIR /build
 
@@ -53,6 +53,9 @@ WORKDIR /app
 # Copy the self-contained binary and source tree from download stage
 COPY --from=download /build/kill-the-newsletter /app/kill-the-newsletter
 COPY --from=download /build/_/ /app/_/
+
+# Copy libatomic (required by bundled Node.js binary, not in Hummingbird image)
+COPY --from=download /usr/lib64/libatomic.so.1* /usr/lib64/
 
 # Copy SMTP TLS certs
 COPY --from=download /build/smtp.key /tls/smtp.key
