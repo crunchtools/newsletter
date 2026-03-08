@@ -1,0 +1,6 @@
+[tool.gourmand]
+exclude = [
+    ".github/",
+    ".specify/",
+    "LICENSE",
+]
