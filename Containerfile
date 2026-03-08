@@ -8,7 +8,7 @@
 #
 # Run:
 #   podman run -d --name newsletter.crunchtools.com \
-#     -p 127.0.0.1:8093:443 \
+#     -p 127.0.0.1:8093:8000 \
 #     -p 0.0.0.0:25:25 \
 #     -v /srv/newsletter.crunchtools.com/config/configuration.mjs:/config/configuration.mjs:ro,Z \
 #     -v /srv/newsletter.crunchtools.com/data:/data:Z \
@@ -61,14 +61,26 @@ COPY --from=download /usr/lib64/libatomic.so.1* /usr/lib64/
 COPY --from=download /build/smtp.key /tls/smtp.key
 COPY --from=download /build/smtp.crt /tls/smtp.crt
 
-# Create data and config directories
+# Patch Caddy module at build time to serve HTTP on port 8000 with the real
+# hostname (not localhost). This lets Apache proxy via plain HTTP while keeping
+# correct Host headers for CSRF and URL generation.
 RUN mkdir -p /data /config && \
-    chmod +x /app/kill-the-newsletter
+    chmod +x /app/kill-the-newsletter && \
+    /app/_/node_modules/.bin/node -e ' \
+      const fs = require("fs"); \
+      const f = "/app/_/node_modules/@radically-straightforward/caddy/build/index.mjs"; \
+      let c = fs.readFileSync(f, "utf8"); \
+      c = c.replace( \
+        /systemAdministratorEmail !== undefined \? hostname : .localhost./, \
+        "`http://${hostname}:8000`" \
+      ); \
+      fs.writeFileSync(f, c); \
+      console.log("Caddy module patched for HTTP on port 8000"); \
+    '
 
-# Web (Caddy): 443 (HTTPS with local certs)
-# Web (Caddy): 80 (HTTP redirect)
+# Web (Caddy): 8000 (HTTP, patched from default 443)
 # SMTP: 25
-EXPOSE 80 443 25
+EXPOSE 8000 25
 
 VOLUME ["/data"]
 
