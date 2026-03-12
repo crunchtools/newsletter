@@ -1,7 +1,7 @@
 # kill-the-newsletter Constitution
 
-> **Version:** 1.0.0
-> **Ratified:** 2026-03-08
+> **Version:** 1.1.0
+> **Ratified:** 2026-03-11
 > **Status:** Active
 > **Inherits:** [crunchtools/constitution](https://github.com/crunchtools/constitution) v1.0.0
 > **Profile:** Container Image
@@ -60,7 +60,14 @@ Follow [Semantic Versioning 2.0.0](https://semver.org/) strictly.
 
 ---
 
-## III. Container Architecture
+## III. Containerfile Conventions
+
+- Uses `Containerfile` (not Dockerfile)
+- Multi-stage build: UBI download stage fetches upstream binary, Hummingbird runtime stage runs it
+- Self-signed TLS certificates generated via `openssl` for SMTP STARTTLS
+- `dnf install -y --nodocs` in download stage, `dnf clean all` after
+
+## IV. Container Architecture
 
 ### Ports
 
@@ -94,7 +101,14 @@ export default {
 
 ---
 
-## IV. Quality Gates
+## V. Testing
+
+- **Build test**: CI builds the container image on every push to main
+- **Weekly rebuild**: Picks up base image and upstream updates
+
+---
+
+## VI. Quality Gates
 
 Every change must pass:
 
@@ -104,7 +118,7 @@ Every change must pass:
 
 ---
 
-## V. Naming Conventions
+## VII. Naming Conventions
 
 | Context | Name |
 |---------|------|
@@ -115,7 +129,7 @@ Every change must pass:
 
 ---
 
-## VI. Governance
+## VIII. Governance
 
 ### Amendment Process
 
@@ -129,3 +143,4 @@ Every change must pass:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-03-08 | Initial constitution |
+| 1.1.0 | 2026-03-11 | Add Containerfile conventions, testing section; fix section numbering |
