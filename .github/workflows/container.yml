@@ -7,9 +7,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 1"  # Weekly rebuild Monday 6 AM UTC
-
 env:
   QUAY_IMAGE: quay.io/crunchtools/kill-the-newsletter
   GHCR_IMAGE: ghcr.io/crunchtools/kill-the-newsletter
