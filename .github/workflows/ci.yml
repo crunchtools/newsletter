@@ -1,0 +1,18 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gourmand:
+    name: Code Quality (Gourmand)
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/crunchtools/gourmand:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Gourmand
+        run: gourmand --full .
