@@ -1,2 +1,11 @@
 .claude/
 .gourmand-cache/
+
+# Python build/cache artifacts
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
