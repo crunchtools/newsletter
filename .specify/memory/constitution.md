@@ -1,146 +1,68 @@
 # kill-the-newsletter Constitution
 
-> **Version:** 1.1.1
+> **Version:** 1.2.0
 > **Ratified:** 2026-03-11
+> **Amended:** 2026-10-02
 > **Status:** Active
-> **Inherits:** [crunchtools/constitution](https://github.com/crunchtools/constitution) v1.17.0
+> **Inherits:** [crunchtools/constitution](https://github.com/crunchtools/constitution) v1.18.0
 > **Profile:** Container Image
 
-This constitution establishes the core principles, constraints, and workflows that govern the Kill the Newsletter container image.
+This file holds what is specific to the Kill the Newsletter image. The fleet
+rules and the Container Image profile apply at the inherited version and are
+checked against this repo's files by `constitution.yml`. They are not restated
+here.
 
----
+## Upstream Binary Packaging
 
-## I. Core Principles
+This repo packages the upstream
+[leafac/kill-the-newsletter](https://github.com/leafac/kill-the-newsletter)
+release (v2.0.9, the self-contained binary with bundled Node.js and Caddy) as
+a container image. It does NOT fork or rebuild the upstream source. The only
+change to upstream is a build-time patch to the bundled Caddy module so it
+serves plain HTTP on port 8000 with the real hostname, letting a reverse
+proxy front it while keeping correct Host headers for CSRF and URL
+generation.
 
-### 1. Upstream Binary Packaging
+Image versioning: MAJOR for an upstream major version bump or changed port
+mappings; MINOR for an upstream minor bump or new configuration options;
+PATCH for Containerfile fixes, certificate updates and base image updates.
 
-This repo packages the upstream [leafac/kill-the-newsletter](https://github.com/leafac/kill-the-newsletter) release as a container image. It does NOT fork, modify, or rebuild the upstream source.
+## Build Stages
 
-**What this repo provides:**
-- Multi-stage Containerfile (UBI download stage + Hummingbird runtime)
-- GitHub Actions workflow for dual-registry push (Quay.io + GHCR)
-- Self-signed TLS certificates for SMTP STARTTLS
-- Governance documents (.specify/)
+| Stage | Image | Role |
+|-------|-------|------|
+| Download | `registry.access.redhat.com/ubi10/ubi` | Fetches the upstream release, generates the SMTP TLS certificate |
+| Runtime | `quay.io/hummingbird/nodejs:latest` | Runs the binary |
 
-**What upstream provides:**
-- The self-contained kill-the-newsletter binary (bundled Node.js + Caddy)
-- Application source code, static assets, and build artifacts
+`libatomic` is copied from the download stage because the bundled Node.js
+needs it and the Hummingbird image does not ship it. SMTP STARTTLS uses a
+self-signed RSA 4096-bit certificate generated at build time.
 
-### 2. Two Registry Channels
-
-Every release MUST be available through both registries:
-
-| Registry | Image |
-|----------|-------|
-| Quay.io (primary) | `quay.io/crunchtools/kill-the-newsletter` |
-| GHCR (mirror) | `ghcr.io/crunchtools/kill-the-newsletter` |
-
-### 3. Semantic Versioning
-
-Follow [Semantic Versioning 2.0.0](https://semver.org/) strictly.
-
-- **MAJOR**: Breaking changes (upstream major version bump, changed port mappings)
-- **MINOR**: New functionality (upstream minor bump, new configuration options)
-- **PATCH**: Bug fixes (Containerfile fixes, cert updates, base image updates)
-
----
-
-## II. Technology Stack
-
-| Layer | Technology |
-|-------|------------|
-| Upstream App | Kill the Newsletter v2.0.9 |
-| Download Stage | registry.access.redhat.com/ubi10/ubi |
-| Runtime Base | quay.io/hummingbird/nodejs:latest |
-| Web Server | Caddy (bundled in upstream binary) |
-| SMTP Server | smtp-server (Node.js, bundled) |
-| Database | SQLite (in /data volume) |
-| TLS (SMTP) | Self-signed RSA 4096-bit |
-| CI/CD | GitHub Actions (dual-push) |
-
----
-
-## III. Containerfile Conventions
-
-- Uses `Containerfile` (not Dockerfile)
-- Multi-stage build: UBI download stage fetches upstream binary, Hummingbird runtime stage runs it
-- Self-signed TLS certificates generated via `openssl` for SMTP STARTTLS
-- `dnf install -y --nodocs` in download stage, `dnf clean all` after
-
-## IV. Container Architecture
-
-### Ports
-
-| Port | Protocol | Purpose |
-|------|----------|---------|
-| 443 | HTTPS | Caddy web UI (local self-signed certs) |
-| 80 | HTTP | Caddy HTTP redirect |
-| 25 | SMTP | Email reception (STARTTLS with self-signed certs) |
-
-### Volumes
-
-| Path | Purpose |
-|------|---------|
-| `/data` | SQLite database + feed files |
-| `/config/configuration.mjs` | Runtime configuration (bind mount) |
-
-### Configuration
-
-Runtime configuration is provided via bind-mounted `/config/configuration.mjs`:
-
-```javascript
-export default {
-  hostname: "newsletter.example.com",
-  tls: {
-    key: "/tls/smtp.key",
-    certificate: "/tls/smtp.crt",
-  },
-  dataDirectory: "/data/",
-};
-```
-
----
-
-## V. Testing
-
-- **Build test**: CI builds the container image on every push to main
-- **Weekly rebuild**: Picks up base image and upstream updates
-
----
-
-## VI. Quality Gates
-
-Every change must pass:
-
-1. **Container Build** — `podman build -f Containerfile .`
-2. **Trivy Scan** — Weekly CVE scanning (continue-on-error)
-3. **Gourmand** — AI slop detection (zero violations)
-
----
-
-## VII. Naming Conventions
+## Instance
 
 | Context | Name |
 |---------|------|
 | GitHub repo | `crunchtools/newsletter` |
 | Container image | `quay.io/crunchtools/kill-the-newsletter` |
-| Lotor service | `newsletter.crunchtools.com.service` |
-| License | AGPL-3.0-or-later |
+| systemd service | `newsletter.crunchtools.com.service` |
 
----
+## Ports and Volumes
 
-## VIII. Governance
+| Port | Purpose |
+|------|---------|
+| 8000 | HTTP web UI (Caddy, patched from its default 443) |
+| 25 | SMTP email reception (STARTTLS) |
 
-### Amendment Process
+| Path | Purpose |
+|------|---------|
+| `/data` | SQLite database and feed files |
+| `/config/configuration.mjs` | Runtime configuration, bind-mounted read-only |
 
-1. Create a PR with proposed changes to this constitution
-2. Document rationale in PR description
-3. Require maintainer approval
-4. Update version number upon merge
-
-### Ratification History
+## History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-03-08 | Initial constitution |
 | 1.1.0 | 2026-03-11 | Add Containerfile conventions, testing section; fix section numbering |
+| 1.1.1 | 2026-09-25 | Gatehouse review, triage and pre-commit gates |
+| 1.2.0 | 2026-10-02 | Manifest under constitution v1.18.0: fleet and profile restatement removed; ports corrected to match the Containerfile (8000, 25) |
