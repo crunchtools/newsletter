@@ -4,7 +4,7 @@
 > **Ratified:** 2026-03-11
 > **Amended:** 2026-10-02
 > **Status:** Active
-> **Inherits:** [crunchtools/constitution](https://github.com/crunchtools/constitution) v1.20.0
+> **Inherits:** [crunchtools/constitution](https://github.com/crunchtools/constitution) v1.21.0
 > **Profile:** Container Image
 
 This file holds what is specific to the Kill the Newsletter image. The fleet
