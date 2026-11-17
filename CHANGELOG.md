@@ -14,7 +14,6 @@ All notable changes to this project are documented here. The format follows
   `nodejs:24` runtime, with better-sqlite3 rebuilt for it, and Caddy v2.11.9 is
   built from source in `caddy/` against golang.org/x/net 0.62.0 and x/crypto
   0.58.0 on Hummingbird's Go 1.27 builder. Dependabot tracks `caddy/go.mod`.
-- Base images move from `quay.io/hummingbird` to `registry.access.redhat.com/hi`.
 
 ## [1.0.1] - 2026-11-11
 

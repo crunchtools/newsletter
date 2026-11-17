@@ -22,7 +22,7 @@
 #     quay.io/crunchtools/kill-the-newsletter:latest
 
 # Stage 1: Caddy from source (caddy/go.mod pins it and its dependencies)
-FROM registry.access.redhat.com/hi/go:1.27-builder AS caddy
+FROM quay.io/hummingbird/go:1.27-builder AS caddy
 
 WORKDIR /src
 COPY caddy/ ./
@@ -30,7 +30,7 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/caddy . && \
     /out/caddy version
 
 # Stage 2: Kill the Newsletter's application tree, rebuilt for Node.js 24
-FROM registry.access.redhat.com/hi/nodejs:24-builder AS download
+FROM quay.io/hummingbird/nodejs:24-builder AS download
 
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -77,7 +77,7 @@ RUN openssl req -x509 -nodes -days 3650 -newkey rsa:4096 \
     -subj "/CN=newsletter.crunchtools.com" 2>/dev/null
 
 # Stage 3: Minimal runtime image
-FROM registry.access.redhat.com/hi/nodejs:24
+FROM quay.io/hummingbird/nodejs:24
 
 LABEL name="kill-the-newsletter" \
       version="1.0.1" \
