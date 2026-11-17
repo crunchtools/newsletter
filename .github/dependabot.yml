@@ -18,3 +18,15 @@ updates:
           - "patch"
     ignore:
       - dependency-name: "crunchtools/constitution*"
+
+  # caddy/ builds the Caddy the image runs; its go.mod pins Caddy and the Go
+  # modules (golang.org/x/net, x/crypto) whose CVEs the container scan gates on.
+  - package-ecosystem: "gomod"
+    directory: "/caddy"
+    schedule:
+      interval: "weekly"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
