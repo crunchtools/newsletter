@@ -31,11 +31,14 @@ PATCH for Containerfile fixes, certificate updates and base image updates.
 
 | Stage | Image | Role |
 |-------|-------|------|
-| Download | `registry.access.redhat.com/ubi10/ubi` | Fetches the upstream release, generates the SMTP TLS certificate |
-| Runtime | `quay.io/hummingbird/nodejs:latest` | Runs the binary |
+| Caddy | `quay.io/hummingbird/go:1.27-builder` | Builds Caddy from `caddy/` (standard modules, Go dependencies pinned in `caddy/go.mod`) |
+| Download | `quay.io/hummingbird/nodejs:24-builder` | Fetches the upstream release, rebuilds better-sqlite3 for node 24, patches Caddy's listener, generates the SMTP TLS certificate |
+| Runtime | `quay.io/hummingbird/nodejs:24` | Runs the application tree on the image's node, with the source-built Caddy |
 
-`libatomic` is copied from the download stage because the bundled Node.js
-needs it and the Hummingbird image does not ship it. SMTP STARTTLS uses a
+Upstream's release bundles its own node and Caddy binaries; neither ships in
+the image, because both carried fixable critical CVEs that upstream had not
+released fixes for. Node stays on 24 (LTS) until the better-sqlite3 that KTN
+ships compiles against a newer V8. SMTP STARTTLS uses a
 self-signed RSA 4096-bit certificate generated at build time.
 
 ## Instance
