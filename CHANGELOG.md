@@ -15,6 +15,16 @@ All notable changes to this project are documented here. The format follows
   built from source in `caddy/` against golang.org/x/net 0.62.0 and x/crypto
   0.58.0 on Hummingbird's Go 1.27 builder. Dependabot tracks `caddy/go.mod`.
 
+### Changed
+
+- The container release runs constitution v1.51.0's `container-release.yml`
+  (was v1.46.0) and grants it `issues: write`, so a failed scheduled rebuild
+  opens an issue instead of only warning. A `v*` promote now also refuses an
+  image whose `version` label names a different release of this repo. This
+  image sets that label in the Containerfile and only a release commit has
+  ever moved it, so the next release must be a release PR that moves it from
+  1.0.1 — where v1.0.2, tagged on a feature merge, left it.
+
 ## [1.0.1] - 2026-11-11
 
 ### Changed
