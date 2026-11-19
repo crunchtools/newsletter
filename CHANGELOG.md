@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows
   0.58.0 on Hummingbird's Go 1.27 builder. Dependabot tracks `caddy/go.mod`.
 
 ### Changed
+- Gatehouse triage receives the review job's result (`review_result`), so a PR whose review died before posting anything is held instead of passing.
 
 - Promote signs the image with the fleet cosign key (`sign: true`), because
   bootc hosts are moving to trust only signed `quay.io/crunchtools` images
