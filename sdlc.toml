@@ -1,2 +1,19 @@
 [tool.sdlc]
 repo-kinds = ["container-image"]
+
+[tool.sdlc.image]
+boot = "none"
+boot-none-reason = "the server needs a mounted config and a data volume, which no enforced profile supplies: the newsletter-image and boot-gate repo checks start it in the image the PR builds"
+
+[tool.sdlc.ci]
+checks = ["newsletter-image", "boot-gate"]
+
+[tool.sdlc.ci.newsletter-image]
+kind = "image-build"
+
+# Runs in the image the PR builds: boot-check.mjs starts the server on loopback
+# and probes it, the same assertion the host-driven boot-gate.sh made.
+[tool.sdlc.ci.boot-gate]
+kind = "command"
+image = "localhost/newsletter:sdlc"
+argv = ["node", "tests/image/boot-check.mjs"]
