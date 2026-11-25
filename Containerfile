@@ -80,7 +80,7 @@ RUN openssl req -x509 -nodes -days 3650 -newkey rsa:4096 \
 FROM quay.io/hummingbird/nodejs:24
 
 LABEL name="kill-the-newsletter" \
-      version="1.0.1" \
+      version="1.0.3" \
       summary="Email-to-RSS bridge converting newsletters to Atom feeds" \
       description="Kill the Newsletter converts email newsletters into Atom feeds for RSS readers" \
       maintainer="crunchtools.com" \

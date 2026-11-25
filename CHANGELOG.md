@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-25
+
 ### Security
 
 - The image no longer runs the Node.js and Caddy binaries bundled in Kill the
@@ -16,6 +18,8 @@ All notable changes to this project are documented here. The format follows
   0.58.0 on Hummingbird's Go 1.27 builder. Dependabot tracks `caddy/go.mod`.
 
 ### Changed
+- CI is the fleet ci.yml (sdlc 0.15): one image build per release, published
+  as `quay.io/crunchtools/newsletter` (was `quay.io/crunchtools/kill-the-newsletter`).
 - Gatehouse triage receives the review job's result (`review_result`), so a PR whose review died before posting anything is held instead of passing.
 
 - Promote signs the image with the fleet cosign key (`sign: true`), because
