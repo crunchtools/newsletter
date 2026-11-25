@@ -37,5 +37,8 @@ for (let attempt = 0; attempt < 60; attempt++) {
 if (verdict !== 0) console.error(`boot gate failed: ${last}`);
 try {
   process.kill(-server.pid, "SIGKILL");
-} catch {}
+} catch (error) {
+  // ESRCH: the group already exited. Anything else may leave the server running.
+  if (error.code !== "ESRCH") console.error(`boot gate: could not kill the server group: ${error.code ?? error.message}`);
+}
 process.exit(verdict);
