@@ -2,8 +2,6 @@
 repo-kinds = ["container-image"]
 
 [tool.sdlc.image]
-# Written by crunchtools/sdlc's scripts/convert_repo.py: moved from the workflows.
-image = "quay.io/crunchtools/kill-the-newsletter"
 boot = "none"
 boot-none-reason = "the server needs a mounted config and a data volume, which no enforced profile supplies: the newsletter-image and boot-gate repo checks start it in the image the PR builds"
 
